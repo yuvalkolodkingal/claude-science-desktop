@@ -26,30 +26,9 @@ finish-args:
   - --filesystem=home
 
 modules:
-  # ---------------------------------------------------------------------------
-  # Claude Science itself — Anthropic's proprietary build, fetched on the user's
-  # machine at install time. Update url/sha256/size together from
-  # https://downloads.claude.ai/claude-science/latest/manifest.json
-  # ---------------------------------------------------------------------------
-  - name: claude-science-daemon
-    buildsystem: simple
-    build-commands:
-      - install -Dm755 apply_extra /app/bin/apply_extra
-    sources:
-      - type: extra-data
-        filename: claude-science
-        url: https://downloads.claude.ai/claude-science/0.1.25/linux-x64
-        sha256: c663367bbc7ec54e7d1e5a9102594a9e70804ed5070f5d7cd1117e665e3c376c
-        size: 158849344
-        x-checker-data:
-          type: json
-          url: https://downloads.claude.ai/claude-science/latest/manifest.json
-          version-query: .version
-          url-query: '"https://downloads.claude.ai/claude-science/" + $version + "/linux-x64"'
-      - type: script
-        dest-filename: apply_extra
-        commands:
-          - chmod 755 claude-science
+  # Note: Claude Science (the daemon) is NOT bundled here. The Electron wrapper
+  # downloads Anthropic's official build at first run and verifies its SHA-256.
+  # This keeps the Flatpak small and avoids redistributing proprietary code.
 
   # ---------------------------------------------------------------------------
   # Electron runtime — official upstream build, pinned by checksum.
