@@ -1,0 +1,112 @@
+{
+  "name": "claude-science-desktop",
+  "productName": "Claude Science Desktop",
+  "version": "0.1.0",
+  "description": "Unofficial desktop window for Claude Science. Not affiliated with Anthropic.",
+  "main": "main.js",
+  "type": "commonjs",
+  "author": "Yuval",
+  "desktopName": "claude-science-desktop.desktop",
+  "license": "MIT",
+  "private": true,
+  "homepage": "https://github.com/yuvalkolodkingal/claude-science-desktop",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yuvalkolodkingal/claude-science-desktop.git"
+  },
+  "scripts": {
+    "icon": "python3 scripts/make-icon.py",
+    "start": "electron .",
+    "dist": "npm run icon && electron-builder --linux deb",
+    "dist:appimage": "npm run icon && electron-builder --linux AppImage",
+    "fetch-daemon": "scripts/fetch-daemon.sh"
+  },
+  "devDependencies": {
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "io.github.yuvalkolodkingal.ClaudeScienceDesktop",
+    "productName": "Claude Science Desktop",
+    "artifactName": "claude-science-desktop-${arch}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "renderer/**",
+      "build/icon.png"
+    ],
+    "linux": {
+      "target": [
+        { "target": "deb", "arch": ["x64"] },
+        { "target": "rpm", "arch": ["x64"] },
+        { "target": "pacman", "arch": ["x64"] },
+        { "target": "tar.gz", "arch": ["x64"] }
+      ],
+      "artifactName": "${name}-linux-${arch}.${ext}",
+      "icon": "build/icon.png",
+      "category": "Science",
+      "syncDesktopName": true,
+      "maintainer": "Yuval <yuvalkgal@gmail.com>",
+      "vendor": "Yuval",
+      "synopsis": "Unofficial desktop window for Claude Science",
+      "description": "Unofficial, community-built desktop window for Claude Science. It locates an existing claude-science install or downloads the official build from downloads.claude.ai on first run (verified against Anthropic's published checksum), starts the local daemon and opens its web UI in a native window. Not affiliated with, endorsed by, or supported by Anthropic.",
+      "desktop": {
+        "entry": {
+          "Name": "Claude Science Desktop",
+          "GenericName": "Local research workspace",
+          "Categories": "Science;",
+          "Keywords": "Claude;AI;Research;"
+        }
+      }
+    },
+    "mac": {
+      "artifactName": "${name}-mac-${arch}.${ext}",
+      "target": [{ "target": "zip", "arch": ["x64", "arm64"] }],
+      "category": "public.app-category.productivity",
+      "identity": null
+    },
+    "win": {
+      "artifactName": "${name}-win-${arch}.${ext}",
+      "target": [
+        { "target": "zip", "arch": ["x64"] },
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "artifactName": "${name}-win-${arch}-setup.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Claude Science Desktop"
+    },
+    "rpm": {
+      "packageName": "claude-science-desktop",
+      "artifactName": "${name}-linux-${arch}.${ext}",
+      "depends": ["gtk3", "libnotify", "nss", "libXScrnSaver", "libXtst", "xdg-utils", "at-spi2-core", "libsecret"]
+    },
+    "pacman": {
+      "packageName": "claude-science-desktop",
+      "artifactName": "${name}-linux-${arch}.${ext}",
+      "depends": ["gtk3", "libnotify", "nss", "libxss", "libxtst", "xdg-utils", "at-spi2-core", "libsecret"]
+    },
+    "deb": {
+      "packageName": "claude-science-desktop",
+      "artifactName": "${name}-linux-${arch}.${ext}",
+      "priority": "optional",
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libsecret-1-0",
+        "libuuid1"
+      ]
+    }
+  }
+}

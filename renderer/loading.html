@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Claude Science</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body {
+    height: 100%; margin: 0;
+    background: #1f1e1d;
+    color: #e8e6e3;
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap {
+    height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px;
+  }
+  .flask { width: 84px; height: 84px; }
+  .flask path, .flask rect { fill: none; stroke: #d97757; stroke-width: 7; stroke-linejoin: round; }
+  h1 { font-size: 17px; font-weight: 550; margin: 0; letter-spacing: .01em; }
+  p { margin: 0; color: #8f8a85; font-size: 13px; }
+  .bar { width: 190px; height: 3px; border-radius: 3px; background: #322f2d; overflow: hidden; }
+  .bar i { display: block; width: 40%; height: 100%; border-radius: 3px; background: #d97757;
+           animation: slide 1.4s ease-in-out infinite; }
+  @keyframes slide { 0% { transform: translateX(-105%); } 100% { transform: translateX(255%); } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <svg class="flask" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M38 12h24" stroke-linecap="round" />
+      <path d="M42 12v28L20 84h60L58 40V12" />
+      <path d="M31 62h38" stroke-linecap="round" />
+    </svg>
+    <h1>Starting Claude Science…</h1>
+    <div class="bar"><i></i></div>
+    <p>Launching the local daemon and opening the workspace.</p>
+  </div>
+</body>
+</html>
