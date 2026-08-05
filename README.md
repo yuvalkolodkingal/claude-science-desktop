@@ -1,8 +1,9 @@
 # Claude Science Desktop
 
-A desktop window for [Claude Science](https://claude.com/product/claude-science) —
-it starts the local `claude-science` daemon, signs you in, and shows the UI in a
-native window instead of a browser tab.
+**The Linux desktop app for [Claude Science](https://claude.com/product/claude-science).**
+Anthropic ships an official desktop app for macOS but not for Linux — only the
+`claude-science` daemon and its browser UI. This starts that daemon, signs you
+in, and shows the UI in a native window instead of a browser tab.
 
 > **Unofficial.** Not affiliated with, endorsed by, or supported by Anthropic.
 > No Anthropic code is redistributed here — the app downloads Claude Science from
@@ -11,7 +12,7 @@ native window instead of a browser tab.
 
 ## Install
 
-**Linux / macOS**
+**Linux**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.sh | sh
@@ -24,26 +25,20 @@ pacman) or a no-sudo portable install. Skip the prompt with
 There is no Flatpak: Claude Science sandboxes its agent with bubblewrap, which
 cannot create its nested user namespace inside a Flatpak sandbox.
 
-**Windows (PowerShell)**
-
-```powershell
-irm https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.ps1 | iex
-```
-
-**Windows (cmd.exe)**
-
-```bash
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.ps1 | iex"
-```
-
 Or grab a package directly from [Releases](https://github.com/yuvalkolodkingal/claude-science-desktop/releases/latest).
+
+**On macOS, use Anthropic's official app instead** — it is signed and notarized:
+[mac-arm64.dmg](https://downloads.claude.ai/claude-science/latest/mac-arm64.dmg) ·
+[mac-x64.dmg](https://downloads.claude.ai/claude-science/latest/mac-x64.dmg).
+Windows is not supported. 
 
 ## What it does
 
-- **Finds or fetches the daemon** — uses `CLAUDE_SCIENCE_BIN`, a Flatpak
-  `extra-data` copy, `claude-science` on your `PATH`, or downloads the official
-  build (~152 MB) on first run, refusing to run it unless the SHA-256 matches
-  Anthropic's manifest.
+- **Installs the daemon for you** — the `.deb`/`.rpm` post-install hook downloads
+  Claude Science (~152 MB) from Anthropic and verifies its SHA-256, so the app is
+  ready the first time you open it. Failing that, the app fetches it on first run.
+  An existing `claude-science` on your `PATH` is used as-is, and
+  `CLAUDE_SCIENCE_BIN` overrides everything.
 - **Starts it and signs you in** — the daemon's login page is a one-click
   anti-prefetch form; the app requests a fresh single-use link and submits it, so
   you never click through a sign-in screen.
@@ -81,10 +76,9 @@ More detail lives in the [wiki](https://github.com/yuvalkolodkingal/claude-scien
 
 ## Caveats
 
-- Linux builds are **x64 only**, because Claude Science ships only a linux-x64
-  binary.
-- macOS and Windows builds are **unsigned** — Gatekeeper and SmartScreen will
-  warn on first launch. The install scripts tell you how to get past it.
+- **x64 only** — Claude Science ships only a linux-x64 binary.
+- **Linux only** — macOS has Anthropic's official app; Windows has no public
+  daemon build to wrap.
 - Startup takes ~10–15 s on a cold daemon (MCP connector warmup) behind a
   loading screen.
 

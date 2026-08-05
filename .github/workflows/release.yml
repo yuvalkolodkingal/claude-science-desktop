@@ -36,42 +36,6 @@ jobs:
             dist/*.pacman
             dist/*.tar.gz
 
-  mac:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      # Unsigned: no certificate, so skip electron-builder's signing step.
-      # Build both arm64 and x64.
-      - run: npx electron-builder --mac zip --publish never
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-      - uses: actions/upload-artifact@v4
-        with:
-          name: mac
-          path: dist/*.zip
-
-  windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx electron-builder --win zip nsis --publish never
-      - uses: actions/upload-artifact@v4
-        with:
-          name: windows
-          path: |
-            dist/*.zip
-            dist/*.exe
-
   sync-wiki:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
@@ -95,7 +59,7 @@ jobs:
             echo "Wiki push failed — wiki may need manual initialization via web UI"
 
   publish:
-    needs: [linux, mac, windows]
+    needs: [linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -128,9 +92,7 @@ jobs:
             curl -fsSL https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.sh | sh
             ```
 
-            ```powershell
-            irm https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.ps1 | iex
-            ```
+            Linux only — on macOS use Anthropic's official app:
+            https://downloads.claude.ai/claude-science/latest/mac-arm64.dmg
 
-            macOS and Windows builds are unsigned; Gatekeeper and SmartScreen
-            will warn on first launch. Verify downloads against `SHA256SUMS`.
+            Verify downloads against `SHA256SUMS`.

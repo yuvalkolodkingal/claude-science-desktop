@@ -1,8 +1,9 @@
 # Claude Science Desktop
 
-An **unofficial** desktop window for [Claude Science](https://claude.com/product/claude-science).
-It starts the local `claude-science` daemon, signs you in, and renders its web UI
-in a native window instead of a browser tab.
+An **unofficial Linux desktop app** for [Claude Science](https://claude.com/product/claude-science).
+Anthropic ships an official desktop app for macOS but not for Linux — this fills
+that gap: it starts the local `claude-science` daemon, signs you in, and renders
+its web UI in a native window instead of a browser tab.
 
 > Not affiliated with, endorsed by, or supported by Anthropic. "Claude" and
 > "Claude Science" are trademarks of Anthropic PBC, used here only to say what
@@ -10,7 +11,7 @@ in a native window instead of a browser tab.
 
 ## Pages
 
-- **[Installation](Installation)** — one-liners, per-distro packages, portable, Windows, macOS
+- **[Installation](Installation)** — one-liner, per-distro packages, portable
 - **[How it works](How-it-works)** — daemon lifecycle, sign-in, link routing
 - **[Building from source](Building-from-source)** — local builds and CI
 - **[Uninstalling](Uninstalling)** — removing the wrapper without touching your data

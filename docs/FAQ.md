@@ -8,22 +8,24 @@ here; bugs in Claude Science itself are Anthropic's.
 
 ### Does it bundle Claude Science?
 
-No. No release artifact contains Anthropic code. The app downloads the official
-build from `downloads.claude.ai` on first run and verifies its SHA-256 against
-Anthropic's published manifest before executing it. The Flatpak does the same at
-install time via `extra-data`.
+No — and that is deliberate. Bundling Anthropic's binary in a package we publish
+would mean redistributing their proprietary software. Instead the `.deb`/`.rpm`
+post-install hook downloads it **on your machine** from `downloads.claude.ai` and
+verifies its SHA-256 against Anthropic's published manifest, so the app is ready
+on first open. If that download fails, the app retries at first launch.
 
-### Why does Windows say "Windows protected your PC"?
+### Is there a macOS or Windows build?
 
-The build is unsigned. **More info → Run anyway.** SmartScreen reputation is tied
-to a code-signing certificate this project does not have; the honest mitigation
-is to check the download against `SHA256SUMS`.
+macOS has an **official** Claude Science app from Anthropic — signed and
+notarized — so this project does not ship one:
+[mac-arm64.dmg](https://downloads.claude.ai/claude-science/latest/mac-arm64.dmg) ·
+[mac-x64.dmg](https://downloads.claude.ai/claude-science/latest/mac-x64.dmg).
 
-### Why does macOS refuse to open it?
+Windows is unsupported: Anthropic publishes no downloadable Windows daemon
+build, so a wrapper would have nothing to run.
 
-Same reason — unsigned and un-notarized. The install script removes the
-quarantine attribute for you. If you installed by hand: right-click the app →
-**Open** → confirm.
+Linux is the gap this project fills — there is no official Linux desktop app,
+only the daemon and its browser UI.
 
 ### It takes 10–15 seconds to start.
 

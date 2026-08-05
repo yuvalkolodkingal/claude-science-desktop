@@ -1,10 +1,12 @@
 # Installation
 
+This wrapper is **Linux-only** — see the bottom of this page for macOS.
+
 Every download is verified against `SHA256SUMS` from the same release before it
 is installed. Linux builds are **x64 only**, because Claude Science itself ships
 only a linux-x64 binary.
 
-## Linux and macOS — one-liner
+## One-liner
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.sh | sh
@@ -30,24 +32,6 @@ Useful environment variables:
 - `CSD_PREFIX=~/.local` — where a portable install lands
 - `CSD_BASE_URL=…` — install from a local directory or mirror of the assets
 
-## Windows
-
-PowerShell:
-
-```powershell
-irm https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.ps1 | iex
-```
-
-cmd.exe:
-
-```bash
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.ps1 | iex"
-```
-
-It installs per-user into `%LOCALAPPDATA%\Programs\ClaudeScienceDesktop` and adds
-Start Menu and Desktop shortcuts. No admin rights required. The build is
-unsigned, so SmartScreen shows "Windows protected your PC" on first launch —
-**More info → Run anyway**.
 
 ## Manual downloads
 
@@ -59,10 +43,6 @@ From [Releases](https://github.com/yuvalkolodkingal/claude-science-desktop/relea
 | `claude-science-desktop-linux-x86_64.rpm` | Fedora, RHEL, openSUSE |
 | `claude-science-desktop-linux-x64.pacman` | Arch, Manjaro, EndeavourOS |
 | `claude-science-desktop-linux-x64.tar.gz` | portable / other |
-| `claude-science-desktop-mac-arm64.zip` | Apple Silicon |
-| `claude-science-desktop-mac-x64.zip` | Intel Macs |
-| `claude-science-desktop-win-x64-setup.exe` | Windows installer |
-| `claude-science-desktop-win-x64.zip` | Windows portable |
 
 Because the filenames carry no version, this link always points at the newest
 build:
@@ -87,3 +67,13 @@ official build (~152 MB) from `downloads.claude.ai`, verifies its SHA-256
 against Anthropic's manifest, and stores it under your user data directory. If
 you already have `claude-science` on your `PATH`, that one is used instead —
 `CLAUDE_SCIENCE_BIN=/path/to/claude-science` overrides everything.
+
+## macOS and Windows
+
+**macOS**: use Anthropic's official app — signed, notarized, and maintained by
+them: [mac-arm64.dmg](https://downloads.claude.ai/claude-science/latest/mac-arm64.dmg)
+(Apple Silicon) or [mac-x64.dmg](https://downloads.claude.ai/claude-science/latest/mac-x64.dmg)
+(Intel). This wrapper would only be a worse, unsigned version of it.
+
+**Windows**: not supported. Anthropic publishes no downloadable Windows build of
+the daemon, so there is nothing for a wrapper to run.

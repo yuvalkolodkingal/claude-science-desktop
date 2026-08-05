@@ -26,20 +26,16 @@ the app downloading the daemon into its user-data directory.
 | --- | --- |
 | `.rpm` | `rpmbuild` (`sudo apt install rpm`) |
 | pacman | fpm's pacman support |
-| macOS `.zip` | a macOS machine |
-| Windows `.exe`/`.zip` | a Windows machine (or Wine, untested) |
 
 ```bash
 npx electron-builder --linux deb rpm pacman tar.gz
-npx electron-builder --mac zip      # on macOS
-npx electron-builder --win zip nsis # on Windows
 ```
 
 ## Releasing
 
 `.github/workflows/release.yml` runs on a `v*` tag: it builds Linux packages
-(with `rpm` installed), the Flatpak bundle, unsigned macOS zips and Windows
-`zip`/`nsis`, then generates `SHA256SUMS` and attaches everything to the release.
+(with `rpm` and `libarchive-tools` installed), then generates `SHA256SUMS` and
+attaches everything to the release.
 
 ```bash
 npm version patch      # or edit package.json
@@ -49,11 +45,3 @@ git push && git push --tags
 Asset filenames deliberately carry **no version**, so
 `releases/latest/download/<asset>` stays a permanent link and the install scripts
 never need the rate-limited GitHub API.
-
-## Signing
-
-There is no code-signing certificate, so macOS and Windows builds are unsigned:
-Gatekeeper needs a right-click → Open (the install script strips the quarantine
-attribute), and SmartScreen needs "Run anyway". Signing would mean an Apple
-Developer account ($99/yr) plus Microsoft Artifact Signing (~$10/mo, US/Canada
-individuals only).

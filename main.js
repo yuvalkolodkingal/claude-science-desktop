@@ -65,7 +65,8 @@ function isExecutableFile(p) {
 function resolveBinary() {
   const candidates = [
     process.env.CLAUDE_SCIENCE_BIN,
-    '/app/extra/claude-science',
+    // Placed next to the executable by the .deb/.rpm post-install hook.
+    path.join(path.dirname(process.execPath), 'bin', 'claude-science'),
     onPath(),
     managedBinPath(),
     path.join(__dirname, 'vendor', 'claude-science'),

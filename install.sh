@@ -1,5 +1,5 @@
 #!/bin/sh
-# Claude Science Desktop installer (Linux, macOS) — unofficial wrapper.
+# Claude Science Desktop installer (Linux) — unofficial wrapper.
 #
 #   curl -fsSL https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.sh | sh
 #
@@ -26,7 +26,6 @@ APP_DIR="$PREFIX/share/$APP_ID"
 BIN_DIR="$PREFIX/bin"
 DESKTOP_DIR="$PREFIX/share/applications"
 ICON_DIR="$PREFIX/share/icons/hicolor/512x512/apps"
-MAC_APP_DIR="${CSD_MAC_PREFIX:-$HOME/Applications}"
 
 MODE=""
 
@@ -42,7 +41,7 @@ detect_platform() {
   case "$(uname -s)" in
     Linux)  OS=linux ;;
     Darwin) OS=mac ;;
-    *) die "unsupported OS: $(uname -s). Windows users: see install.ps1" ;;
+    *) die "unsupported OS: $(uname -s) — this wrapper is Linux-only." ;;
   esac
   case "$(uname -m)" in
     x86_64|amd64)  ARCH=x64 ;;
@@ -77,30 +76,24 @@ uninstall() {
   detect_platform
   removed=0
 
-  if [ "$OS" = mac ]; then
-    if [ -d "$MAC_APP_DIR/$APP_NAME.app" ]; then
-      rm -rf "$MAC_APP_DIR/$APP_NAME.app"; say "Removed $MAC_APP_DIR/$APP_NAME.app"; removed=1
-    fi
-  else
-    # Older versions shipped a Flatpak; clean it up if one is still installed.
-    if have flatpak && flatpak info "$FLATPAK_ID" >/dev/null 2>&1; then
-      flatpak uninstall -y "$FLATPAK_ID" && say "Removed the legacy Flatpak."; removed=1
-    fi
-    if have dpkg && dpkg -s "$APP_ID" >/dev/null 2>&1; then
-      sudo dpkg -r "$APP_ID" && say "Removed the .deb."; removed=1
-    fi
-    if have rpm && rpm -q "$APP_ID" >/dev/null 2>&1; then
-      sudo rpm -e "$APP_ID" && say "Removed the .rpm."; removed=1
-    fi
-    if have pacman && pacman -Q "$APP_ID" >/dev/null 2>&1; then
-      sudo pacman -R --noconfirm "$APP_ID" && say "Removed the pacman package."; removed=1
-    fi
-    if [ -d "$APP_DIR" ]; then
-      rm -rf "$APP_DIR"
-      rm -f "$BIN_DIR/$APP_ID" "$DESKTOP_DIR/$APP_ID.desktop" "$ICON_DIR/$APP_ID.png"
-      have update-desktop-database && update-desktop-database "$DESKTOP_DIR" 2>/dev/null || true
-      say "Removed the portable install."; removed=1
-    fi
+  # Older versions shipped a Flatpak; clean it up if one is still installed.
+  if have flatpak && flatpak info "$FLATPAK_ID" >/dev/null 2>&1; then
+    flatpak uninstall -y "$FLATPAK_ID" && say "Removed the legacy Flatpak."; removed=1
+  fi
+  if have dpkg && dpkg -s "$APP_ID" >/dev/null 2>&1; then
+    sudo dpkg -r "$APP_ID" && say "Removed the .deb."; removed=1
+  fi
+  if have rpm && rpm -q "$APP_ID" >/dev/null 2>&1; then
+    sudo rpm -e "$APP_ID" && say "Removed the .rpm."; removed=1
+  fi
+  if have pacman && pacman -Q "$APP_ID" >/dev/null 2>&1; then
+    sudo pacman -R --noconfirm "$APP_ID" && say "Removed the pacman package."; removed=1
+  fi
+  if [ -d "$APP_DIR" ]; then
+    rm -rf "$APP_DIR"
+    rm -f "$BIN_DIR/$APP_ID" "$DESKTOP_DIR/$APP_ID.desktop" "$ICON_DIR/$APP_ID.png"
+    have update-desktop-database && update-desktop-database "$DESKTOP_DIR" 2>/dev/null || true
+    say "Removed the portable install."; removed=1
   fi
 
   [ "$removed" = 1 ] || say "Nothing to uninstall."
@@ -223,27 +216,6 @@ EOF
   esac
 }
 
-install_mac() {
-  tmp="$1"
-  need unzip
-  zipname="$APP_ID-mac-$ARCH.zip"
-  fetch "$zipname" "$tmp/$zipname"
-
-  mkdir -p "$MAC_APP_DIR"
-  rm -rf "$MAC_APP_DIR/$APP_NAME.app"
-  unzip -q "$tmp/$zipname" -d "$tmp/unpacked"
-  bundle="$(find "$tmp/unpacked" -maxdepth 2 -name '*.app' | head -n1)"
-  [ -n "$bundle" ] || die "no .app bundle in the release archive"
-  mv "$bundle" "$MAC_APP_DIR/$APP_NAME.app"
-
-  # The build is unsigned, so Gatekeeper would refuse it on first open.
-  xattr -dr com.apple.quarantine "$MAC_APP_DIR/$APP_NAME.app" 2>/dev/null || true
-
-  say ""
-  say "Installed $MAC_APP_DIR/$APP_NAME.app"
-  say "Unsigned build: if macOS still blocks it, right-click the app → Open → confirm."
-}
-
 # --- choosing ---------------------------------------------------------------
 
 choose_mode() {
@@ -308,7 +280,15 @@ main() {
   say "$APP_NAME — unofficial wrapper for Claude Science"
 
   if [ "$OS" = mac ]; then
-    install_mac "$tmp"
+    say ""
+    say "macOS already has an official Claude Science app from Anthropic —"
+    say "signed, notarized, and better than anything this wrapper can offer:"
+    say ""
+    say "  Apple Silicon: https://downloads.claude.ai/claude-science/latest/mac-arm64.dmg"
+    say "  Intel:         https://downloads.claude.ai/claude-science/latest/mac-x64.dmg"
+    say ""
+    say "This wrapper exists for Linux, where there is no official desktop app."
+    exit 0
   else
     detect_distro
     choose_mode

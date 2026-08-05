@@ -1,6 +1,6 @@
 # Uninstalling
 
-## Linux and macOS
+## Linux
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.sh | sh -s -- --uninstall
@@ -17,16 +17,7 @@ sudo dnf remove claude-science-desktop          # Fedora
 sudo pacman -R claude-science-desktop           # Arch
 flatpak uninstall io.github.yuvalkolodkingal.ClaudeScienceDesktop  # only if you installed an old build
 rm -rf ~/.local/share/claude-science-desktop    # portable
-rm -rf ~/Applications/"Claude Science Desktop.app"
 ```
-
-## Windows
-
-```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.ps1))) -Uninstall
-```
-
-Or, if you used the `.exe` installer, uninstall it from **Settings → Apps**.
 
 ## What survives on purpose
 
