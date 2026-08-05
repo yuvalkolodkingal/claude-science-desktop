@@ -121,6 +121,10 @@ asset_url() {
   fi
 }
 
+asset_exists() {
+  curl -fsIL -o /dev/null --max-time 15 "$(asset_url "$1")" 2>/dev/null
+}
+
 sha256_of() {
   if have sha256sum; then sha256sum "$1" | cut -d' ' -f1
   elif have shasum; then shasum -a 256 "$1" | cut -d' ' -f1
@@ -131,8 +135,10 @@ sha256_of() {
 fetch() {
   name="$1"; dest="$2"
   say "  downloading $name"
-  curl -fL --progress-bar "$(asset_url "$name")" -o "$dest" ||
-    die "could not download $name — is there a published release yet?"
+  curl -fL --progress-bar "$(asset_url "$name")" -o "$dest" || die "$name is not in this release.
+Some packages are built by CI and land a few minutes after the release is cut.
+Try another install mode — sh -s -- --portable  (or --native) — or see
+  https://github.com/$REPO/releases/latest"
 
   if curl -fsSL "$(asset_url SHA256SUMS)" -o "$dest.sums" 2>/dev/null; then
     expected="$(grep -F "  $name" "$dest.sums" | cut -d' ' -f1 | head -n1)"
@@ -257,33 +263,52 @@ install_mac() {
 choose_mode() {
   [ -n "$MODE" ] && return 0
 
+  # Only offer what this release actually published — CI-built packages can lag
+  # the release by a few minutes.
+  say "  checking which packages this release has…"
+  NATIVE_OK=no; FLATPAK_OK=no
+  [ "$FAMILY" != unknown ] && asset_exists "$NATIVE_ASSET" && NATIVE_OK=yes
+  asset_exists "$APP_ID-x86_64.flatpak" && FLATPAK_OK=yes
+  have flatpak || FLATPAK_OK=no
+
   # `curl | sh` leaves stdin as the pipe, so ask the terminal directly.
   if [ -r /dev/tty ]; then
     say ""
     say "Detected: $DISTRO"
-    if [ "$FAMILY" = unknown ]; then
-      say "  1) Flatpak    per-user, sandboxed, works on any distro"
-      say "  2) Portable   unpack into $APP_DIR, no sudo"
-      default=1
-    else
-      say "  1) Native     $NATIVE_ASSET via $NATIVE_CMD (needs sudo)"
-      say "  2) Flatpak    per-user, sandboxed"
-      say "  3) Portable   unpack into $APP_DIR, no sudo"
-      default=1
+    n=0
+    if [ "$NATIVE_OK" = yes ]; then
+      n=$((n + 1)); OPT_NATIVE=$n
+      say "  $n) Native     $NATIVE_ASSET via $NATIVE_CMD (needs sudo)"
     fi
-    printf 'Choice [%s]: ' "$default"
-    read -r choice </dev/tty || choice=""
-    choice="${choice:-$default}"
+    if [ "$FLATPAK_OK" = yes ]; then
+      n=$((n + 1)); OPT_FLATPAK=$n
+      say "  $n) Flatpak    per-user, sandboxed"
+    fi
+    n=$((n + 1)); OPT_PORTABLE=$n
+    say "  $n) Portable   unpack into $APP_DIR, no sudo"
 
-    if [ "$FAMILY" = unknown ]; then
-      case "$choice" in 2) MODE=portable ;; *) MODE=flatpak ;; esac
-    else
-      case "$choice" in 2) MODE=flatpak ;; 3) MODE=portable ;; *) MODE=native ;; esac
+    if [ "$FAMILY" != unknown ] && [ "$NATIVE_OK" = no ]; then
+      say "     (no $NATIVE_ASSET in this release yet)"
     fi
+    if [ "$FLATPAK_OK" = no ]; then
+      if have flatpak; then say "     (no Flatpak bundle in this release yet)"
+      else say "     (Flatpak not installed on this system)"; fi
+    fi
+
+    printf 'Choice [1]: '
+    read -r choice </dev/tty || choice=""
+    choice="${choice:-1}"
+
+    case "$choice" in
+      "${OPT_NATIVE:-_}")   MODE=native ;;
+      "${OPT_FLATPAK:-_}")  MODE=flatpak ;;
+      "${OPT_PORTABLE:-_}") MODE=portable ;;
+      *) die "no such choice: $choice" ;;
+    esac
   else
-    # Non-interactive: native where we know the distro, else Flatpak, else portable.
-    if [ "$FAMILY" != unknown ]; then MODE=native
-    elif have flatpak; then MODE=flatpak
+    # Non-interactive: native where available, else Flatpak, else portable.
+    if [ "$NATIVE_OK" = yes ]; then MODE=native
+    elif [ "$FLATPAK_OK" = yes ]; then MODE=flatpak
     else MODE=portable
     fi
     say "No terminal to prompt on — choosing: $MODE (override with --native/--flatpak/--portable)"
