@@ -5,9 +5,8 @@ with no npm runtime dependencies. It does four things.
 
 ## 1. Find the daemon
 
-In order: `CLAUDE_SCIENCE_BIN`, `/app/extra/claude-science` (the Flatpak's
-`extra-data` copy), `claude-science` on `PATH`, its own managed copy in the app's
-user-data directory, then `vendor/claude-science` for dev checkouts.
+In order: `CLAUDE_SCIENCE_BIN`, `claude-science` on `PATH`, its own managed copy
+in the app's user-data directory, then `vendor/claude-science` for dev checkouts.
 
 If none exists, it downloads `https://downloads.claude.ai/claude-science/<version>/linux-x64`,
 where `<version>` comes from Anthropic's `latest/manifest.json`, and compares the
@@ -52,11 +51,3 @@ link. **File → New Login Link** forces one manually.
 Quitting stops the daemon **the app started**. A daemon that was already running
 when the app launched is left alone. **File → Quit (leave daemon running)** skips
 the shutdown for that one quit.
-
-## Flatpak specifics
-
-The Flatpak runs Electron through `zypak-wrapper` from
-`org.electronjs.Electron2.BaseApp`, so Chromium's sandbox works inside the
-Flatpak sandbox. `--filesystem=home` is required because Claude Science works on
-your files and keeps state in `~/.claude-science`; `--share=network` covers the
-daemon's own outbound requests, which it gates behind its in-app approval cards.

@@ -18,8 +18,11 @@ curl -fsSL https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-des
 ```
 
 On Linux it detects your distro and offers a native package (`.deb`, `.rpm`,
-pacman), a Flatpak, or a no-sudo portable install. Skip the prompt with
-`| sh -s -- --native`, `--flatpak`, or `--portable`.
+pacman) or a no-sudo portable install. Skip the prompt with
+`| sh -s -- --native` or `--portable`.
+
+There is no Flatpak: Claude Science sandboxes its agent with bubblewrap, which
+cannot create its nested user namespace inside a Flatpak sandbox.
 
 **Windows (PowerShell)**
 
@@ -66,8 +69,8 @@ Your Claude Science data in `~/.claude-science` is never touched by that.
 npm install && npm run dist
 ```
 
-Produces `.deb` and `.tar.gz` in `dist/`. `.rpm`, pacman and Flatpak builds need
-`rpmbuild` / `flatpak-builder`, so CI builds those on tagged releases. For a dev
+Produces `.deb` and `.tar.gz` in `dist/`. `.rpm` and pacman need `rpmbuild` and
+`bsdtar`, so CI builds those on tagged releases. For a dev
 run against a local daemon copy:
 
 ```bash

@@ -58,13 +58,23 @@ both on `127.0.0.1`. Change them by starting the daemon yourself with
 No. Claude Science ships only a `linux-x64` binary, so an ARM wrapper would have
 nothing to run. macOS ARM is fine — Anthropic ships `darwin-arm64`.
 
-### Why not Flathub?
+### Why is there no Flatpak?
 
-Flathub's requirements rule this app out three ways: thin wrappers around other
-tools and simple web wrappers are not accepted, its Generative AI policy forbids
-applications containing AI-generated or AI-assisted code, and its trademark rules
-forbid a wrapper carrying the wrapped product's name. The Flatpak bundle here is
-distributed straight from GitHub Releases instead.
+Because Claude Science cannot run inside one. It sandboxes its agent with
+**bubblewrap** and refuses to start without `bwrap` on `PATH` — that sandbox is
+what stops the agent from having full `$HOME` read/write and unrestricted
+network. Creating the nested user namespace bwrap needs is blocked inside a
+Flatpak sandbox, and stays blocked even with `--allow=devel`. The only way to
+make it run would be `--dangerously-no-sandbox`, which removes exactly the
+protection Anthropic built in — so this project does not ship a Flatpak.
+
+On distros without a native package, use the portable install
+(`sh -s -- --portable`); it needs no root and works anywhere.
+
+Flathub was never an option either: its requirements reject thin wrappers and
+simple web wrappers, its Generative AI policy forbids applications containing
+AI-generated or AI-assisted code, and its trademark rules forbid a wrapper
+carrying the wrapped product's name.
 
 ### How do I get updates?
 

@@ -26,7 +26,6 @@ the app downloading the daemon into its user-data directory.
 | --- | --- |
 | `.rpm` | `rpmbuild` (`sudo apt install rpm`) |
 | pacman | fpm's pacman support |
-| Flatpak | `flatpak-builder` + the 25.08 Platform/Sdk + `org.electronjs.Electron2.BaseApp` |
 | macOS `.zip` | a macOS machine |
 | Windows `.exe`/`.zip` | a Windows machine (or Wine, untested) |
 
@@ -34,17 +33,6 @@ the app downloading the daemon into its user-data directory.
 npx electron-builder --linux deb rpm pacman tar.gz
 npx electron-builder --mac zip      # on macOS
 npx electron-builder --win zip nsis # on Windows
-```
-
-Flatpak:
-
-```bash
-flatpak install -y flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08 \
-  org.electronjs.Electron2.BaseApp//25.08
-flatpak-builder --repo=repo --force-clean build-dir \
-  flatpak/io.github.yuvalkolodkingal.ClaudeScienceDesktop.yml
-flatpak build-bundle repo claude-science-desktop-x86_64.flatpak \
-  io.github.yuvalkolodkingal.ClaudeScienceDesktop
 ```
 
 ## Releasing

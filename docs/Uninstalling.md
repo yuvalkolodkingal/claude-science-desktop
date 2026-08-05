@@ -15,7 +15,7 @@ By hand:
 sudo apt remove claude-science-desktop          # Debian / Ubuntu
 sudo dnf remove claude-science-desktop          # Fedora
 sudo pacman -R claude-science-desktop           # Arch
-flatpak uninstall io.github.yuvalkolodkingal.ClaudeScienceDesktop
+flatpak uninstall io.github.yuvalkolodkingal.ClaudeScienceDesktop  # only if you installed an old build
 rm -rf ~/.local/share/claude-science-desktop    # portable
 rm -rf ~/Applications/"Claude Science Desktop.app"
 ```
