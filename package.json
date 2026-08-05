@@ -1,7 +1,7 @@
 {
   "name": "claude-science-desktop",
   "productName": "Claude Science Desktop",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Unofficial Linux desktop app for Claude Science. Not affiliated with Anthropic.",
   "main": "main.js",
   "type": "commonjs",

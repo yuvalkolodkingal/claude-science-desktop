@@ -18,12 +18,9 @@ in, and shows the UI in a native window instead of a browser tab.
 curl -fsSL https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.sh | sh
 ```
 
-On Linux it detects your distro and offers a native package (`.deb`, `.rpm`,
-pacman) or a no-sudo portable install. Skip the prompt with
-`| sh -s -- --native` or `--portable`.
-
-There is no Flatpak: Claude Science sandboxes its agent with bubblewrap, which
-cannot create its nested user namespace inside a Flatpak sandbox.
+It detects your distro and offers a native package (`.deb`, `.rpm`, pacman), a
+Flatpak, or a no-sudo portable install. Skip the prompt with
+`| sh -s -- --native`, `--flatpak`, or `--portable`.
 
 Or grab a package directly from [Releases](https://github.com/yuvalkolodkingal/claude-science-desktop/releases/latest).
 

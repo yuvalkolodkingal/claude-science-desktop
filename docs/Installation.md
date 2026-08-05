@@ -17,12 +17,14 @@ On Linux it detects your distro and asks how you want it installed:
 | Mode | What it does | Needs sudo |
 | --- | --- | --- |
 | **Native** | `.deb` via apt, `.rpm` via dnf/zypper, or pacman package | yes |
+| **Flatpak** | per-user bundle; UI sandboxed, daemon runs on the host | no |
 | **Portable** | unpacks into `~/.local/share/claude-science-desktop` + a menu entry | no |
 
 Skip the prompt:
 
 ```bash
 curl -fsSL .../install.sh | sh -s -- --native
+curl -fsSL .../install.sh | sh -s -- --flatpak
 curl -fsSL .../install.sh | sh -s -- --portable
 ```
 
@@ -42,6 +44,7 @@ From [Releases](https://github.com/yuvalkolodkingal/claude-science-desktop/relea
 | `claude-science-desktop-linux-amd64.deb` | Debian, Ubuntu, Mint, Pop!_OS |
 | `claude-science-desktop-linux-x86_64.rpm` | Fedora, RHEL, openSUSE |
 | `claude-science-desktop-linux-x64.pacman` | Arch, Manjaro, EndeavourOS |
+| `claude-science-desktop-x86_64.flatpak` | any distro with Flatpak |
 | `claude-science-desktop-linux-x64.tar.gz` | portable / other |
 
 Because the filenames carry no version, this link always points at the newest
@@ -51,9 +54,15 @@ build:
 https://github.com/yuvalkolodkingal/claude-science-desktop/releases/latest/download/claude-science-desktop-linux-amd64.deb
 ```
 
-There is deliberately **no Flatpak**: Claude Science sandboxes its agent with
-bubblewrap, which cannot create its nested user namespace inside a Flatpak
-sandbox. Use the portable install on distros without a native package.
+Install a Flatpak bundle by hand:
+
+```bash
+flatpak install --user ./claude-science-desktop-x86_64.flatpak
+```
+
+The Flatpak sandboxes the UI but runs the daemon on the host via
+`flatpak-spawn`, because Claude Science's own bubblewrap sandbox cannot nest
+inside Flatpak.
 
 ## Arch (AUR-style build)
 

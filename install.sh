@@ -4,10 +4,11 @@
 #   curl -fsSL https://raw.githubusercontent.com/yuvalkolodkingal/claude-science-desktop/main/install.sh | sh
 #
 # On Linux it detects your distro and offers the matching native package
-# (.deb / .rpm / pacman) or a self-contained directory in $HOME.
+# (.deb / .rpm / pacman), a Flatpak, or a self-contained directory in $HOME.
 # Pick non-interactively with a flag:
 #
 #   ... | sh -s -- --native      distro package (needs sudo)
+#   ... | sh -s -- --flatpak     Flatpak bundle (per-user, no sudo)
 #   ... | sh -s -- --portable    unpack into ~/.local/share (no sudo)
 #   ... | sh -s -- --uninstall
 #
@@ -169,6 +170,22 @@ install_native() {
   say "Installed $APP_NAME — launch it from your app menu or run: $APP_ID"
 }
 
+install_flatpak() {
+  tmp="$1"
+  need flatpak
+  bundle="$APP_ID-x86_64.flatpak"
+  fetch "$bundle" "$tmp/$bundle"
+  say ""
+  say "Installing the Flatpak (per-user)…"
+  flatpak install --user -y --noninteractive "$tmp/$bundle" ||
+    die "flatpak install failed — you may need the Flathub remote:
+  flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo"
+  say ""
+  say "Installed. Launch it from your app menu, or: flatpak run $FLATPAK_ID"
+  say "Note: Claude Science itself runs on the host (its own sandbox needs"
+  say "bubblewrap, which cannot run inside Flatpak)."
+}
+
 install_portable() {
   tmp="$1"
   tarball="$APP_ID-linux-$ARCH.tar.gz"
@@ -224,8 +241,9 @@ choose_mode() {
   # Only offer what this release actually published — CI-built packages can lag
   # the release by a few minutes.
   say "  checking which packages this release has…"
-  NATIVE_OK=no
+  NATIVE_OK=no; FLATPAK_OK=no
   [ "$FAMILY" != unknown ] && asset_exists "$NATIVE_ASSET" && NATIVE_OK=yes
+  have flatpak && asset_exists "$APP_ID-x86_64.flatpak" && FLATPAK_OK=yes
 
   # `curl | sh` leaves stdin as the pipe, so ask the terminal directly.
   if [ -r /dev/tty ]; then
@@ -236,11 +254,18 @@ choose_mode() {
       n=$((n + 1)); OPT_NATIVE=$n
       say "  $n) Native     $NATIVE_ASSET via $NATIVE_CMD (needs sudo)"
     fi
+    if [ "$FLATPAK_OK" = yes ]; then
+      n=$((n + 1)); OPT_FLATPAK=$n
+      say "  $n) Flatpak    per-user, sandboxed UI"
+    fi
     n=$((n + 1)); OPT_PORTABLE=$n
     say "  $n) Portable   unpack into $APP_DIR, no sudo"
 
     if [ "$FAMILY" != unknown ] && [ "$NATIVE_OK" = no ]; then
       say "     (no $NATIVE_ASSET in this release yet)"
+    fi
+    if [ "$FLATPAK_OK" = no ] && ! have flatpak; then
+      say "     (Flatpak not installed on this system)"
     fi
 
     printf 'Choice [1]: '
@@ -249,12 +274,16 @@ choose_mode() {
 
     case "$choice" in
       "${OPT_NATIVE:-_}")   MODE=native ;;
+      "${OPT_FLATPAK:-_}")  MODE=flatpak ;;
       "${OPT_PORTABLE:-_}") MODE=portable ;;
       *) die "no such choice: $choice" ;;
     esac
   else
     # Non-interactive: native where available, else portable.
-    if [ "$NATIVE_OK" = yes ]; then MODE=native; else MODE=portable; fi
+    if [ "$NATIVE_OK" = yes ]; then MODE=native
+    elif [ "$FLATPAK_OK" = yes ]; then MODE=flatpak
+    else MODE=portable
+    fi
     say "No terminal to prompt on — choosing: $MODE (override with --native/--flatpak/--portable)"
   fi
 }
@@ -264,6 +293,7 @@ main() {
     case "$arg" in
       --uninstall) uninstall ;;
       --native)   MODE=native ;;
+      --flatpak)  MODE=flatpak ;;
       --portable) MODE=portable ;;
       -h|--help)  sed -n '2,20p' "$0" 2>/dev/null || say "see the header of install.sh"; exit 0 ;;
       *) die "unknown option: $arg" ;;
@@ -296,6 +326,7 @@ main() {
       native)
         [ "$FAMILY" != unknown ] || die "no native package for this distro — use --flatpak or --portable"
         install_native "$tmp" ;;
+      flatpak)  install_flatpak "$tmp" ;;
       portable) install_portable "$tmp" ;;
     esac
   fi

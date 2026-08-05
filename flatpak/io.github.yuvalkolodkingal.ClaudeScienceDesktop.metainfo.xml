@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.yuvalkolodkingal.ClaudeScienceDesktop</id>
+
+  <name>Claude Science Desktop</name>
+  <summary>Unofficial desktop window for Claude Science</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <!-- MIT covers this wrapper. Claude Science itself is Anthropic's proprietary
+       software, downloaded by the app from Anthropic and governed by their terms. -->
+  <project_license>MIT</project_license>
+
+  <developer id="io.github.yuvalkolodkingal">
+    <name>Yuval</name>
+  </developer>
+
+  <description>
+    <p>
+      An unofficial, community-built desktop window for Claude Science on Linux,
+      where Anthropic ships no official desktop app. It starts the local
+      claude-science daemon, signs you in, and renders its web UI in a native
+      window instead of a browser tab.
+    </p>
+    <p>
+      Not affiliated with, endorsed by, or supported by Anthropic. "Claude" and
+      "Claude Science" are trademarks of Anthropic PBC, used here only to
+      describe which program this wrapper opens.
+    </p>
+    <p>
+      No Anthropic code is included. Claude Science is downloaded from
+      Anthropic's own servers and verified against the checksum Anthropic
+      publishes. Using it requires accepting Anthropic's terms.
+    </p>
+    <p>
+      Note: Claude Science sandboxes its agent with bubblewrap, which cannot run
+      inside a Flatpak sandbox, so this app starts the daemon on the host.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.yuvalkolodkingal.ClaudeScienceDesktop.desktop</launchable>
+
+  <url type="homepage">https://github.com/yuvalkolodkingal/claude-science-desktop</url>
+  <url type="bugtracker">https://github.com/yuvalkolodkingal/claude-science-desktop/issues</url>
+  <url type="help">https://github.com/yuvalkolodkingal/claude-science-desktop/wiki</url>
+
+  <content_rating type="oars-1.1" />
+
+  <categories>
+    <category>Science</category>
+  </categories>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <requires>
+    <display_length compare="ge">640</display_length>
+  </requires>
+
+  <releases>
+    <release version="0.1.1" date="2026-08-05">
+      <description>
+        <p>Linux-only release; the daemon is fetched at install time.</p>
+      </description>
+    </release>
+  </releases>
+</component>

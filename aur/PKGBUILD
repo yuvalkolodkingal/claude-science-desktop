@@ -4,7 +4,7 @@
 # daemon is downloaded by the app at first run from downloads.claude.ai and
 # verified against Anthropic's published checksum.
 pkgname=claude-science-desktop
-pkgver=0.1.1
+pkgver=0.1.2
 pkgrel=1
 pkgdesc="Unofficial desktop window for Claude Science (downloads Claude Science on first run)"
 arch=('x86_64')

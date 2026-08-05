@@ -26,6 +26,7 @@ the app downloading the daemon into its user-data directory.
 | --- | --- |
 | `.rpm` | `rpmbuild` (`sudo apt install rpm`) |
 | pacman | fpm's pacman support |
+| Flatpak | `org.flatpak.Builder` + Platform/Sdk 25.08 + `org.electronjs.Electron2.BaseApp` |
 
 ```bash
 npx electron-builder --linux deb rpm pacman tar.gz
@@ -45,3 +46,15 @@ git push && git push --tags
 Asset filenames deliberately carry **no version**, so
 `releases/latest/download/<asset>` stays a permanent link and the install scripts
 never need the rate-limited GitHub API.
+
+## Flatpak
+
+```bash
+flatpak install -y --user flathub org.flatpak.Builder \
+  org.freedesktop.Platform//25.08 org.freedesktop.Sdk//25.08 \
+  org.electronjs.Electron2.BaseApp//25.08
+flatpak run org.flatpak.Builder --user --force-clean --install --repo=repo \
+  build-dir flatpak/io.github.yuvalkolodkingal.ClaudeScienceDesktop.yml
+flatpak build-bundle repo claude-science-desktop-x86_64.flatpak \
+  io.github.yuvalkolodkingal.ClaudeScienceDesktop
+```

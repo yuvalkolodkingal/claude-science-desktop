@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
+const fsExistsSync = (p) => { try { return fs.existsSync(p); } catch { return false; } };
+
 // ---------------------------------------------------------------------------
 // Unofficial desktop wrapper for Claude Science. Not affiliated with Anthropic.
 //
@@ -13,6 +15,12 @@ const crypto = require('crypto');
 // It then starts that daemon, gets a single-use login link, and shows the local
 // web UI in a native window.
 // ---------------------------------------------------------------------------
+
+// Inside Flatpak the daemon cannot run in the sandbox at all: Claude Science
+// sandboxes its agent with bubblewrap, and creating that nested user namespace
+// is blocked here. So it runs on the host via flatpak-spawn, where its own
+// sandbox works, and only this UI stays sandboxed.
+const IN_FLATPAK = Boolean(process.env.FLATPAK_ID) || fsExistsSync('/.flatpak-info');
 
 const DOWNLOAD_BASE = 'https://downloads.claude.ai/claude-science';
 const MANIFEST_URL = `${DOWNLOAD_BASE}/latest/manifest.json`;
@@ -41,12 +49,27 @@ if (!app.requestSingleInstanceLock()) {
 // --- locating the daemon ---------------------------------------------------
 
 function managedBinPath() {
+  // In Flatpak this must be a real host path, because the host executes it.
+  if (IN_FLATPAK) {
+    return process.env.CLAUDE_SCIENCE_HOST_BIN ||
+      path.join(app.getPath('home'), '.local', 'share', 'claude-science-desktop', 'bin', 'claude-science');
+  }
   return path.join(app.getPath('userData'), 'bin', 'claude-science');
+}
+
+// Build the argv for running the daemon. Sandboxed, that means handing it to
+// the host through flatpak-spawn; otherwise it is a plain exec.
+function daemonCmd(args) {
+  if (IN_FLATPAK) return ['flatpak-spawn', ['--host', BIN, ...args]];
+  return [BIN, args];
 }
 
 function onPath() {
   try {
-    return execFileSync('sh', ['-c', 'command -v claude-science'], { encoding: 'utf8' }).trim() || null;
+    const argv = IN_FLATPAK
+      ? ['flatpak-spawn', ['--host', 'sh', '-c', 'command -v claude-science']]
+      : ['sh', ['-c', 'command -v claude-science']];
+    return execFileSync(argv[0], argv[1], { encoding: 'utf8' }).trim() || null;
   } catch {
     return null;
   }
@@ -71,7 +94,16 @@ function resolveBinary() {
     managedBinPath(),
     path.join(__dirname, 'vendor', 'claude-science'),
   ];
-  return candidates.find(isExecutableFile) || null;
+  const found = candidates.find(isExecutableFile);
+  if (found) return found;
+
+  // Under Flatpak the host's copy may be outside anything we can stat; if the
+  // host reports one on its PATH, take it at its word.
+  if (IN_FLATPAK) {
+    const hostHit = onPath();
+    if (hostHit) return hostHit;
+  }
+  return null;
 }
 
 // --- first-run download ----------------------------------------------------
@@ -170,8 +202,9 @@ async function downloadDaemon(onProgress) {
 // --- daemon control --------------------------------------------------------
 
 function run(args, { timeout = 20_000 } = {}) {
+  const [cmd, argv] = daemonCmd(args);
   return new Promise((resolve) => {
-    execFile(BIN, args, { timeout, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
+    execFile(cmd, argv, { timeout, maxBuffer: 4 * 1024 * 1024 }, (error, stdout, stderr) => {
       resolve({ error, stdout: String(stdout || ''), stderr: String(stderr || '') });
     });
   });
@@ -189,7 +222,8 @@ async function status() {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function startDaemon() {
-  daemonProc = spawn(BIN, ['serve', '--no-browser'], {
+  const [cmd, argv] = daemonCmd(['serve', '--no-browser']);
+  daemonProc = spawn(cmd, argv, {
     stdio: 'ignore',
     detached: true,
     env: process.env,
@@ -222,7 +256,8 @@ async function waitForDaemon() {
 
 function stopDaemon() {
   try {
-    execFileSync(BIN, ['stop'], { timeout: 15_000, stdio: 'ignore' });
+    const [cmd, argv] = daemonCmd(['stop']);
+    execFileSync(cmd, argv, { timeout: 15_000, stdio: 'ignore' });
   } catch {
     if (daemonProc) daemonProc.kill('SIGTERM');
   }
@@ -396,7 +431,7 @@ async function boot() {
         }
       });
     }
-    console.log(`[wrapper] using ${BIN}`);
+    console.log(`[wrapper] using ${BIN}${IN_FLATPAK ? ' (run on host via flatpak-spawn)' : ''}`);
 
     setStatus('Starting the Claude Science daemon…');
     let s = await status();
