@@ -84,5 +84,7 @@ them: [mac-arm64.dmg](https://downloads.claude.ai/claude-science/latest/mac-arm6
 (Apple Silicon) or [mac-x64.dmg](https://downloads.claude.ai/claude-science/latest/mac-x64.dmg)
 (Intel). This wrapper would only be a worse, unsigned version of it.
 
-**Windows**: not supported. Anthropic publishes no downloadable Windows build of
-the daemon, so there is nothing for a wrapper to run.
+**Windows**: not supported by this project. Anthropic publishes no downloadable
+Windows build of the daemon, so there is nothing for this wrapper to run. See
+[Claude-Science-Windows](https://github.com/ben1ahrens/Claude-Science-Windows)
+for a Windows build instead.

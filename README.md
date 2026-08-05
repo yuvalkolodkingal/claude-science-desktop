@@ -27,7 +27,9 @@ Or grab a package directly from [Releases](https://github.com/yuvalkolodkingal/c
 **On macOS, use Anthropic's official app instead** — it is signed and notarized:
 [mac-arm64.dmg](https://downloads.claude.ai/claude-science/latest/mac-arm64.dmg) ·
 [mac-x64.dmg](https://downloads.claude.ai/claude-science/latest/mac-x64.dmg).
-Windows is not supported. 
+Windows is not supported by this project — see
+[Claude-Science-Windows](https://github.com/ben1ahrens/Claude-Science-Windows) for a
+Windows build instead.
 
 ## What it does
 
@@ -74,8 +76,8 @@ More detail lives in the [wiki](https://github.com/yuvalkolodkingal/claude-scien
 ## Caveats
 
 - **x64 only** — Claude Science ships only a linux-x64 binary.
-- **Linux only** — macOS has Anthropic's official app; Windows has no public
-  daemon build to wrap.
+- **Linux only** — macOS has Anthropic's official app; for Windows see
+  [Claude-Science-Windows](https://github.com/ben1ahrens/Claude-Science-Windows).
 - Startup takes ~10–15 s on a cold daemon (MCP connector warmup) behind a
   loading screen.
 

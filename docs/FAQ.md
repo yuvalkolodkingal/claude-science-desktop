@@ -21,8 +21,10 @@ notarized — so this project does not ship one:
 [mac-arm64.dmg](https://downloads.claude.ai/claude-science/latest/mac-arm64.dmg) ·
 [mac-x64.dmg](https://downloads.claude.ai/claude-science/latest/mac-x64.dmg).
 
-Windows is unsupported: Anthropic publishes no downloadable Windows daemon
-build, so a wrapper would have nothing to run.
+Windows is unsupported here: Anthropic publishes no downloadable Windows daemon
+build, so this wrapper would have nothing to run. See
+[Claude-Science-Windows](https://github.com/ben1ahrens/Claude-Science-Windows)
+for a Windows build instead.
 
 Linux is the gap this project fills — there is no official Linux desktop app,
 only the daemon and its browser UI.
