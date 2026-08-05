@@ -19,9 +19,10 @@ jobs:
           node-version: 22
           cache: npm
 
-      # rpmbuild is what electron-builder's fpm needs for the .rpm target.
+      # fpm shells out to rpmbuild for .rpm, and to bsdtar (libarchive-tools)
+      # for the pacman target's .MTREE.
       - name: Install packaging tools
-        run: sudo apt-get update && sudo apt-get install -y rpm
+        run: sudo apt-get update && sudo apt-get install -y rpm libarchive-tools
 
       - run: npm ci
       - run: npx electron-builder --linux deb rpm pacman tar.gz --publish never
